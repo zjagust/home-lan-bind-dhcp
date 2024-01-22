@@ -37,6 +37,7 @@ if [[ "$(whoami)" != "root" ]]
 ## INITIAL VARIABLES ##
 #######################
 HOST_GATEWAY=$(ip route get "$(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+')" | grep -oP 'src \K\S+')
+PUBLIC_IP=$(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+')
 IPV4_FORWARDING=$(cat /proc/sys/net/ipv4/ip_forward)
 SYSCTL_CONFIG="/etc/sysctl.conf"
 ETH1_CHECK=$(find /sys/class/net/ -name "eth1" -printf "%f\n")
@@ -247,24 +248,32 @@ function dhcpSetup () {
 function fwSetup () {
 
     # Flush everything
-    #iptables -t nat -F
-    #iptables -t mangle -F
-    #iptables -F
-    #iptables -X
+    iptables -t nat -F
+    iptables -t mangle -F
+    iptables -F
+    iptables -X
 
-    # Backup old rules
-    #mv /etc/iptables/rules.v4 /etc/iptables/rules.v4.bkp
+	# Set new rules
+	iptables -N GENERAL-ALLOW
+	iptables -N REJECT-ALL
+	iptables -A INPUT -m comment --comment "No rules of any kind below this rule" -j GENERAL-ALLOW
+	iptables -A INPUT -j REJECT-ALL
+	iptables -A FORWARD -i eth0 -o eth1 -m state --state RELATED,ESTABLISHED -m comment --comment "Forward to Local LAN" -j ACCEPT
+	iptables -A FORWARD -i eth1 -o eth0 -m comment --comment "Forward from Local LAN" -j ACCEPT
+	iptables -A GENERAL-ALLOW -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "Established Connections" -j ACCEPT
+	iptables -A GENERAL-ALLOW -p tcp -m tcp --dport 22 --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "SSH Access" -j ACCEPT
+	iptables -A GENERAL-ALLOW -d "$PUBLIC_IP"/32 -p udp -m udp -m comment --comment "Local UDP Traffic" -j ACCEPT
+	iptables -A GENERAL-ALLOW -s "$2".0/24 -d "$2".1/32 -p tcp -m tcp --dport 53 -m comment --comment "Local DNS Traffic" -j ACCEPT
+	iptables -A GENERAL-ALLOW -s "$2".0/24 -d "$2".1/32 -p udp -m udp --dport 53 -m comment --comment "Local DNS Traffic" -j ACCEPT
+	iptables -A GENERAL-ALLOW -p icmp -j ACCEPT
+	iptables -A GENERAL-ALLOW -i lo -j ACCEPT
+	iptables -A REJECT-ALL -p tcp -j REJECT --reject-with tcp-reset
+	iptables -A REJECT-ALL -p udp -j REJECT --reject-with icmp-port-unreachable
+	iptables -A REJECT-ALL -p icmp -j DROP
+	iptables -t nat -A POSTROUTING -o eth0 -m comment --comment "Masquarade Local Traffic" -j MASQUERADE
 
-    # Download new rules
-    curl -Sso /etc/iptables/rules.v4 \
-    https://raw.githubusercontent.com/zjagust/home-lan-bind-dhcp/main/firewall/rules.v4
-
-    # Populate firewall with the correct values
-    sed -i "s/NETWORK/$2/g" /etc/iptables/rules.v4
-    sed -i "s/HOST_GATEWAY/$HOST_GATEWAY/g" /etc/iptables/rules.v4
-
-    # Set new rules
-    iptables-restore < /etc/iptables/rules.v4
+    # Save new rules
+    iptables-save > /etc/iptables/rules.v4
 
 }
 
