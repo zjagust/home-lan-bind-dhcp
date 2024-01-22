@@ -10,3 +10,8 @@ The script must be supplied with two arguments:
  
  - A local network "prefix" (i.e., 192.168.100)
  - A local domain name (i.e., example.com)
+
+**Example:**
+```bash
+bash home-lan-bind-dhcp.sh -i 192.168.100 example.com
+```
