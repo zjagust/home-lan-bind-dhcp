@@ -247,13 +247,13 @@ function dhcpSetup () {
 function fwSetup () {
 
     # Flush everything
-    iptables -t nat -F
-    iptables -t mangle -F
-    iptables -F
-    iptables -X
+    #iptables -t nat -F
+    #iptables -t mangle -F
+    #iptables -F
+    #iptables -X
 
     # Backup old rules
-    mv /etc/iptables/rules.v4 /etc/iptables/rules.v4.bkp
+    #mv /etc/iptables/rules.v4 /etc/iptables/rules.v4.bkp
 
     # Download new rules
     curl -Sso /etc/iptables/rules.v4 \
