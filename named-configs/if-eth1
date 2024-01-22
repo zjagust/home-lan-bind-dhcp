@@ -4,4 +4,4 @@
     address NETWORK.1/24
     broadcast NETWORK.255
     dns-search FQDN
-	dns-nameservers NETWORK.1
+    dns-nameservers NETWORK.1
