@@ -37,7 +37,6 @@ if [[ "$(whoami)" != "root" ]]
 ## INITIAL VARIABLES ##
 #######################
 HOST_GATEWAY=$(ip route get "$(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+')" | grep -oP 'src \K\S+')
-PUBLIC_IP=$(ip route show 0.0.0.0/0 | grep -oP 'via \K\S+')
 IPV4_FORWARDING=$(cat /proc/sys/net/ipv4/ip_forward)
 SYSCTL_CONFIG="/etc/sysctl.conf"
 ETH1_CHECK=$(find /sys/class/net/ -name "eth1" -printf "%f\n")
@@ -262,7 +261,7 @@ function fwSetup () {
 	iptables -A FORWARD -i eth1 -o eth0 -m comment --comment "Forward from Local LAN" -j ACCEPT
 	iptables -A GENERAL-ALLOW -p tcp -m tcp ! --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "Established Connections" -j ACCEPT
 	iptables -A GENERAL-ALLOW -p tcp -m tcp --dport 22 --tcp-flags FIN,SYN,RST,ACK SYN -m comment --comment "SSH Access" -j ACCEPT
-	iptables -A GENERAL-ALLOW -d "$PUBLIC_IP"/32 -p udp -m udp -m comment --comment "Local UDP Traffic" -j ACCEPT
+	iptables -A GENERAL-ALLOW -d "$HOST_GATEWAY"/32 -p udp -m udp -m comment --comment "Local UDP Traffic" -j ACCEPT
 	iptables -A GENERAL-ALLOW -s "$2".0/24 -d "$2".1/32 -p tcp -m tcp --dport 53 -m comment --comment "Local DNS Traffic" -j ACCEPT
 	iptables -A GENERAL-ALLOW -s "$2".0/24 -d "$2".1/32 -p udp -m udp --dport 53 -m comment --comment "Local DNS Traffic" -j ACCEPT
 	iptables -A GENERAL-ALLOW -p icmp -j ACCEPT
