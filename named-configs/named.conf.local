@@ -1,0 +1,29 @@
+//
+// Do any local configuration here
+//
+
+// Manage the file logs
+include "/etc/bind/named.conf.log";
+
+// Domain Management local.lan
+// ------------------------------
+//  - The server is defined as the master on the domain.
+//  - There are no forwarders for this domain.
+//  - Entries in the domain can be added dynamically
+//    with the key FQDN
+zone "FQDN" {
+        type master;
+        notify no;
+        file "/var/cache/bind/db.FQDN";
+        allow-update { key FQDN; };
+};
+zone "REVERSE_NETin-addr.arpa" {
+        type master;
+        notify no;
+        file "/var/cache/bind/db.REVERSE_NETin-addr.arpa";
+        allow-update { key FQDN; };
+};
+
+// Consider adding the 1918 zones here, if they are not used in your
+// organization
+// include "/etc/bind/zones.rfc1918";

@@ -1,0 +1,7 @@
+# Local DNS network interface
+ auto eth1
+ iface eth1 inet static
+    address NETWORK.1/24
+    broadcast NETWORK.255
+    dns-search FQDN
+	dns-nameservers NETWORK.1

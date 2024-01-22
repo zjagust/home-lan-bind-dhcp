@@ -1,0 +1,48 @@
+options {
+    directory "/var/cache/bind";
+
+    // Exchange port between DNS servers
+    query-source address *;
+
+    // If there is a firewall between you and nameservers you want
+    // to talk to, you may need to fix the firewall to allow multiple
+    // ports to talk.  See http://www.kb.cert.org/vuls/id/800113
+    
+    // If your ISP provided one or more IP addresses for stable
+    // nameservers, you probably want to use them as forwarders.
+    // Uncomment the following block, and insert the addresses replacing
+    // the all-0's placeholder.
+
+    // Cloudflare Malware Blocking Forwarders
+    forward only;
+    forwarders {
+        1.1.1.2;
+        1.0.0.2;
+    };
+
+    auth-nxdomain no;    # conform to RFC1035
+
+    //========================================================================
+    // If BIND logs error messages about the root key being expired,
+    // you will need to update your keys.  See https://www.isc.org/bind-keys
+    //========================================================================
+    dnssec-validation yes;
+
+    // From 9.9.5 ARM, disables interfaces scanning to prevent unwanted stop listening
+    interface-interval 0;
+    listen-on-v6 { none; };
+    listen-on { NETWORK.1; };
+
+    // Do not transfer the zone information to the secondary DNS
+    allow-transfer { none; };
+
+    // Accept requests for internal network only
+    allow-query { internals; };
+    allow-query-cache { internals; };
+
+    // Allow recursive queries to the local hosts
+    allow-recursion { internals; };
+
+    // Do not make public version of BIND
+    version none;
+};

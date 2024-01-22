@@ -1,0 +1,12 @@
+; zone db.REVERSE_NETin-addr.arpa
+;
+$TTL    86400
+@       IN      SOA     FQDN.       root.FQDN. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                          86400 )       ; Negative Cache TTL
+;
+@       IN      NS      HOSTNAME.FQDN.
+1       IN      PTR     HOSTNAME.FQDN.
