@@ -62,7 +62,7 @@ function setOptions () {
 		 ${B}-i:${R} Install DNS and DHCP servies
 		   -> (usage: $0 [-i] NETWORK FQDN 
 		   ->  NETWORK EXAMPLE: 192.168.100
-           ->  FQDN EXAMPLE: home.lan)
+		   ->  FQDN EXAMPLE: home.lan)
 		${SPACER}
 	END
 }
