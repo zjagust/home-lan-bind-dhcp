@@ -200,7 +200,7 @@ function bind9Setup () {
 
     # Set a reverse zone
     curl -Sso "$BIND9_WORKDIR"/db."$REVERSE_NET"in-addr.arpa \
-    https://raw.githubusercontent.com/zjagust/home-lan-bind-dhcp/main/named-configs/zone.fwd
+    https://raw.githubusercontent.com/zjagust/home-lan-bind-dhcp/main/named-configs/zone.rev
 
     # Populate reverse zone with the correct values
     sed -i "s/REVERSE_NET/$REVERSE_NET/g" "$BIND9_WORKDIR"/db."$REVERSE_NET"in-addr.arpa
